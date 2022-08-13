@@ -52,23 +52,22 @@ int main(int argc, char const* argv[]){
         exit(EXIT_FAILURE);
     }
     
-    char* hello1 = "Hello client 1 from server";
     char *notRecieved = "Message Not Recieved by Server";
     char *recieved = "Message Recieved by Server";
     
     char buffer[10] = { 0 };
-    memset(buffer, 0, sizeof(buffer));
-    
     int bytesLeft = sizeof(buffer) - sizeof(char);
+    //If you're expecting to recv() a string,
+    //It is suggested giving the recv() function arraysize-1 bytes to write to,
+    //That way, bytesLeft can be used to safely apply the \0 character at the end
 
-    valread = read(new_socket1, buffer, bytesLeft);
-    if (valread < 0)
-    {
-    error("ERROR reading from socket");
+    valread = recv(new_socket1, buffer, bytesLeft+1, 0);
+    
+    if (valread < 0){
+        error("ERROR reading from socket");
     }
-    if(valread == 0)
-    {
-    error("peer shutted down");
+    else if(valread == bytesLeft+1){
+        error("peer shutted down");
     }
 	    
     bytesLeft -= valread;
@@ -87,7 +86,8 @@ int main(int argc, char const* argv[]){
 
     printf("%s\n", buffer);
 
-    send(new_socket1, hello1, strlen(hello1), 0);
+    char* hello = "Hello client from server";
+    send(new_socket1, hello, strlen(hello), 0);
     printf("Hello message sent\n");
     
     // closing the connected socket
