@@ -112,6 +112,8 @@ class meshNetwork{
 
         void printNetwork(){
 
+            cout<<"--------------"<<endl;
+
             for(auto it=graph.begin(); it != graph.end(); it++){
 
                 Node* thisNode = *it;
@@ -125,13 +127,51 @@ class meshNetwork{
                 
                 cout<<endl;
             }
+
+            cout<<"--------------"<<endl;
         }
 };
 
 int main(){
 
-    meshNetwork mn = meshNetwork(10);
-    mn.printNetwork();
+    int n;
+
+    cout<<"Please input the size of the network"<<endl;
+    cin>>n;
+
+    meshNetwork mn = meshNetwork(n);
+    
+    while(1){
+        int op;
+
+        cout<<"\n";
+        cout<<"Press 1 and Enter for adding a node\n";
+        cout<<"Press 2 and Enter for deleting a node\n";
+        cout<<"Press 3 and Enter for printing the network\n";
+        cout<<endl;
+
+        cin>>op;
+
+        switch (op){
+            case 1:
+                int nodeToBeAdded;
+                cout<<"Enter ther node id"<<endl;
+                cin >> nodeToBeAdded;
+                mn.addNode(nodeToBeAdded);
+                break;
+            
+            case 2:
+                int nodeToBeDeleted;
+                cout<<"Enter ther node id"<<endl;
+                cin >> nodeToBeDeleted;
+                mn.deleteNode(nodeToBeDeleted);
+                break;
+
+            case 3:
+                mn.printNetwork();
+                break;
+        }
+    }
 
     return 0;
 }
