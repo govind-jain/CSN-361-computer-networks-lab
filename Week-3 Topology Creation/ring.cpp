@@ -71,7 +71,7 @@ class ringNetwork{
 
         void deleteNode(int el){
 
-            if(graph.size() == 0){
+            if(size == 0){
                 cout<<"Graph is empty"<<endl;
                 return;
             }
@@ -110,20 +110,16 @@ class ringNetwork{
                     next = *(graph.begin());
                 }
 
-                if(prev == next){
-                    (next->adj).remove(toBeDeleted);
-                }
-                else{
-                    (prev->adj).remove(toBeDeleted);
-                    (next->adj).remove(toBeDeleted);
-
-                    (prev->adj).push_back(next);
-                    (next->adj).push_front(prev);
-                }
-
-                (toBeDeleted->adj).clear();
+                (prev->adj).remove(toBeDeleted);
+                (next->adj).remove(toBeDeleted);
             }
 
+            if(prev != next){
+                (prev->adj).push_back(next);
+                (next->adj).push_front(prev);
+            }
+
+            (toBeDeleted->adj).clear();
             delete(toBeDeleted);
             cout<<"Successfully deleted the node: "<<el<<endl;
         }

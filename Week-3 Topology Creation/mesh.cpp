@@ -20,6 +20,8 @@ class meshNetwork{
     
     public:
         meshNetwork(int n){
+            size = 0;
+
             for(int i=1; i<=n; i++){
                 addNode(i);
             }
@@ -57,7 +59,7 @@ class meshNetwork{
 
         void deleteNode(int el){
 
-            if(graph.size() == 0){
+            if(size == 0){
                 cout<<"Graph is empty"<<endl;
                 return;
             }
