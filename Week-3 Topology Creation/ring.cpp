@@ -46,6 +46,47 @@ class ringNetwork{
             size = n;
         }
 
+        void addNode(int el){
+
+            auto itr = graph.begin();
+
+            for(; itr != graph.end(); itr++){
+                if((*itr)->id == el){
+                    break;
+                }
+            }
+
+            if(itr != graph.end()){
+                cout<<"Element is already present"<<endl;
+                return;
+            }
+
+            Node* toBeAdded = new Node(el);
+
+            if(size == 1){
+                Node* first = *graph.begin();
+
+                (first->adj).push_back(toBeAdded);
+                (toBeAdded->adj).push_front(first);
+            }
+            else if(size > 1){
+                Node* first = *graph.begin();
+                Node* last = *graph.rbegin();
+
+                (first->adj).remove(last);
+                (last->adj).remove(first);
+
+                (last->adj).push_back(toBeAdded);
+                (first->adj).push_front(toBeAdded);
+
+                (toBeAdded->adj).push_front(last);
+                (toBeAdded->adj).push_back(first);
+            }
+
+            graph.push_back(toBeAdded);
+            size++;
+        }
+
         void deleteNode(int el){
 
             if(graph.size() == 0){
