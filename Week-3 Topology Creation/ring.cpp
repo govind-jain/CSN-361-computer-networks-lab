@@ -46,7 +46,68 @@ class ringNetwork{
             size = n;
         }
 
+        void deleteNode(int el){
+
+            if(graph.size() == 0){
+                cout<<"Graph is empty"<<endl;
+                return;
+            }
+
+            Node* prev = NULL;
+            auto itr = graph.begin();
+
+            for(; itr != graph.end(); itr++){
+
+                if((*itr)->id == el){
+                    break;
+                }
+
+                prev = *itr;
+            }
+
+            if(itr == graph.end()){
+                cout<<"Element is not present"<<endl;
+                return;
+            }
+
+            Node* toBeDeleted = *itr;
+
+            auto nextItr = itr;
+            advance(nextItr, 1);
+            Node *next = (nextItr != graph.end())? *nextItr: NULL;
+
+            graph.erase(itr);
+            size--;
+
+            if(size > 0){
+                if(prev == NULL){
+                    prev = *(graph.rbegin());
+                }
+                else if(next == NULL){
+                    next = *(graph.begin());
+                }
+
+                if(prev == next){
+                    (next->adj).remove(toBeDeleted);
+                }
+                else{
+                    (prev->adj).remove(toBeDeleted);
+                    (next->adj).remove(toBeDeleted);
+
+                    (prev->adj).push_back(next);
+                    (next->adj).push_front(prev);
+                }
+
+                (toBeDeleted->adj).clear();
+            }
+
+            delete(toBeDeleted);
+            cout<<"Successfully deleted the node: "<<el<<endl;
+        }
+
         void printNetwork(){
+
+            cout<<"--------------"<<endl;
 
             for(auto it=graph.begin(); it != graph.end(); it++){
 
@@ -61,12 +122,23 @@ class ringNetwork{
                 
                 cout<<endl;
             }
+
+            cout<<"--------------"<<endl;
         }
 };
 
 int main(){
 
     ringNetwork rn = ringNetwork(10);
+    rn.printNetwork();
+
+    rn.deleteNode(1);
+    rn.printNetwork();
+
+    rn.deleteNode(10);
+    rn.printNetwork();
+
+    rn.deleteNode(7);
     rn.printNetwork();
 
     return 0;
