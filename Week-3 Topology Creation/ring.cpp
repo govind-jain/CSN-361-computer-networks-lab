@@ -170,17 +170,45 @@ class ringNetwork{
 
 int main(){
 
-    ringNetwork rn = ringNetwork(10);
-    rn.printNetwork();
+    int n;
 
-    rn.deleteNode(1);
-    rn.printNetwork();
+    cout<<"Please input the size of the network"<<endl;
+    cin>>n;
 
-    rn.deleteNode(10);
-    rn.printNetwork();
+    ringNetwork rn = ringNetwork(n);
+    
+    while(1){
+        int op;
 
-    rn.deleteNode(7);
-    rn.printNetwork();
+        cout<<"\n";
+        cout<<"Press 1 and Enter for adding a node\n";
+        cout<<"Press 2 and Enter for deleting a node\n";
+        cout<<"Press 3 and Enter for printing the network\n";
+        cout<<endl;
+
+        cin>>op;
+
+        switch (op){
+            case 1:
+                int nodeToBeAdded;
+                cout<<"Enter ther node id"<<endl;
+                cin >> nodeToBeAdded;
+                rn.addNode(nodeToBeAdded);
+                break;
+            
+            case 2:
+                int nodeToBeDeleted;
+                cout<<"Enter ther node id"<<endl;
+                cin >> nodeToBeDeleted;
+                rn.deleteNode(nodeToBeDeleted);
+                break;
+
+            case 3:
+                rn.printNetwork();
+                break;
+        }
+        
+    }
 
     return 0;
 }
