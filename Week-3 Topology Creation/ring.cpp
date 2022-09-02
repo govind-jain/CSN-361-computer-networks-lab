@@ -62,25 +62,26 @@ class ringNetwork{
             }
 
             Node* toBeAdded = new Node(el);
+            Node* first = NULL;
+            Node* last = NULL;
 
-            if(size == 1){
-                Node* first = *graph.begin();
+            if(size > 0){
+                first = *(graph.begin());
 
                 (first->adj).push_back(toBeAdded);
                 (toBeAdded->adj).push_front(first);
             }
-            else if(size > 1){
-                Node* first = *graph.begin();
-                Node* last = *graph.rbegin();
 
-                (first->adj).remove(last);
-                (last->adj).remove(first);
+            if(size > 1){
+                last = *(graph.rbegin());
 
                 (last->adj).push_back(toBeAdded);
-                (first->adj).push_front(toBeAdded);
-
                 (toBeAdded->adj).push_front(last);
-                (toBeAdded->adj).push_back(first);
+            }
+
+            if(size > 2){
+                (first->adj).remove(last);
+                (last->adj).remove(first);
             }
 
             graph.push_back(toBeAdded);
