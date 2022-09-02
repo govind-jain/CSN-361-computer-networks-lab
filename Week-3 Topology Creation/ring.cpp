@@ -20,30 +20,11 @@ class ringNetwork{
     
     public:
         ringNetwork(int n){
+            size = 0;
 
-            if(n == 0){
-                return;
+            for(int i=1; i<=n; i++){
+                addNode(i);
             }
-
-            Node* first = new Node(1);
-            graph.push_back(first);
-
-            Node* prev = first;
-            
-            for(int i=2; i<=n; i++){
-                Node* newNode = new Node(i);
-                graph.push_back(newNode);
-
-                (prev->adj).push_back(newNode);
-                (newNode->adj).push_back(prev);
-
-                prev = newNode;
-            }
-            
-            (prev->adj).push_back(first);
-            (first->adj).push_back(prev);
-
-            size = n;
         }
 
         void addNode(int el){
