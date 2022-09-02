@@ -45,6 +45,36 @@ class meshNetwork{
             size = n;
         }
 
+        void addNode(int el){
+
+            auto itr = graph.begin();
+
+            for(; itr != graph.end(); itr++){
+                if((*itr)->id == el){
+                    break;
+                }
+            }
+
+            if(itr != graph.end()){
+                cout<<"Element is already present"<<endl;
+                return;
+            }
+
+            Node* toBeAdded = new Node(el);
+
+            for(auto it=graph.begin(); it != graph.end(); it++){
+
+                Node* thisNode = *it;
+                list<Node*> &thisAdjList = thisNode -> adj;
+
+                thisAdjList.push_back(toBeAdded);
+                (toBeAdded->adj).push_back(thisNode);
+            }
+
+            graph.push_back(toBeAdded);
+            size++;
+        }
+
         void deleteNode(int el){
 
             if(graph.size() == 0){
