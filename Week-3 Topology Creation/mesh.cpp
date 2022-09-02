@@ -45,6 +45,41 @@ class meshNetwork{
             size = n;
         }
 
+        void deleteNode(int el){
+
+            if(graph.size() == 0){
+                cout<<"Graph is empty"<<endl;
+                return;
+            }
+
+            auto itr = graph.begin();
+
+            for(; itr != graph.end(); itr++){
+                if((*itr)->id == el){
+                    break;
+                }
+            }
+
+            if(itr == graph.end()){
+                cout<<"Element is not present"<<endl;
+                return;
+            }
+
+            Node* toBeDeleted = *itr;
+
+            graph.erase(itr);
+            size--;
+
+            for(auto it=graph.begin(); it != graph.end(); it++){
+                list<Node*> &thisAdjList = (*it) -> adj;
+                thisAdjList.remove(toBeDeleted);
+            }
+
+            (toBeDeleted->adj).clear();
+            delete(toBeDeleted);
+            cout<<"Successfully deleted the node: "<<el<<endl;
+        }
+
         void printNetwork(){
 
             for(auto it=graph.begin(); it != graph.end(); it++){
