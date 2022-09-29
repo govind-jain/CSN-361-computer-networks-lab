@@ -1,5 +1,4 @@
-// Server side C/C++ program to demonstrate Socket
-// programming
+// Server side C/C++ program to demonstrate Socket programming
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +6,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
-
 
 int main(int argc, char const* argv[]){
     
@@ -58,6 +56,10 @@ int main(int argc, char const* argv[]){
     //It is suggested giving the recv() function arraysize-1 bytes to write to,
     //That way, bytesLeft can be used to safely apply the \0 character at the end
 
+    // Here, physically size = bytesLeft+1, but virtually,
+    // we will consider buffer size to be bytesLeft.
+    // If message size = bytesLeft+1, we will consider overflow.
+
     valread = recv(new_socket, buffer, bytesLeft+1, 0);
     
     if (valread < 0){
@@ -66,11 +68,11 @@ int main(int argc, char const* argv[]){
 	    
     bytesLeft -= valread;
 	
-    if(bytesLeft == -1 && read(new_socket, buffer, 1) > 0){
+    if(bytesLeft == -1){
         char *notRecievedBufferIssue = "Message Not Recieved by Server due to Low Buffer Size";
     	send(new_socket, notRecievedBufferIssue, strlen(notRecievedBufferIssue), 0);
 
-        printf("Message was not fully received due to low buffer size\n");
+        printf("Message was not fully received due to low buffer size.\n");
     }
     else{
     	printf("%s\n", buffer);
