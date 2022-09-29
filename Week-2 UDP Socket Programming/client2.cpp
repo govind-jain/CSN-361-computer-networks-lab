@@ -2,7 +2,7 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
-#include <string.h> 
+#include <bits/stdc++.h> 
 #include <sys/types.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
@@ -10,6 +10,21 @@
     
 #define PORT 8080 
 #define MAXLINE 1024 
+
+using namespace std;
+
+string getMessage(char* buffer, int st, int en, int lim){
+
+    en = min(en, lim);
+
+    string res = "";
+
+    for(int i=st; i<en; i++){
+        res += buffer[i];
+    }
+
+    return res;
+}
 
 // Driver code 
 int main(){
@@ -36,8 +51,8 @@ int main(){
     char *youAreSource  = "You are successfully connected. You will be treated as source";
     char *youAreSink = "You are successfully connected. You will be treated as sink";
     
-    int n, len;
-    int connectionEstablished = 0;
+    socklen_t len;
+    ssize_t n;
 
     sendto(sockfd, (const char *)connectRequest, strlen(connectRequest), MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)); 
     printf("Connection request sent.\n"); 
@@ -45,12 +60,26 @@ int main(){
     while(1){
         n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, (struct sockaddr *) &servaddr, &len); 
         
-        if(connectionEstablished==0 && strcmp(buffer, youAreSource) == 0){
-            connectionEstablished = 1;
-            break;
+        if(n == -1){
+            printf("Message not recieved successfully");
+            continue;
         }
 
-        printf("Server : %s\n", buffer); 
+        string strRecieved = getMessage(buffer, 0, n, MAXLINE);
+        char* messageRecieved = const_cast<char*>(strRecieved.c_str());
+
+        printf("Server : %s\n", messageRecieved);
+
+        if(strcmp(messageRecieved, youAreSource) == 0){
+            break;
+        }
+    }
+
+    //Send random messages
+    for(int i=0; i<10; i++){
+        string message = "Message-" + to_string(i) + " from client-1";
+        char *messageToBeSent = const_cast<char*>(message.c_str());
+        sendto(sockfd, (const char *)messageToBeSent, strlen(messageToBeSent), MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)); 
     }
     
     close(sockfd); 

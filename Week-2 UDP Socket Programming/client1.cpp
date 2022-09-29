@@ -53,7 +53,6 @@ int main(){
     
     socklen_t len;
     ssize_t n;
-    int connectionEstablished = 0;
 
     sendto(sockfd, (const char *)connectRequest, strlen(connectRequest), MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)); 
     printf("Connection request sent.\n"); 
@@ -69,12 +68,18 @@ int main(){
         string strRecieved = getMessage(buffer, 0, n, MAXLINE);
         char* messageRecieved = const_cast<char*>(strRecieved.c_str());
 
-        if(connectionEstablished==0 && strcmp(messageRecieved, youAreSource) == 0){
-            connectionEstablished = 1;
+        printf("Server : %s\n", messageRecieved);
+
+        if(strcmp(messageRecieved, youAreSource) == 0){
             break;
         }
+    }
 
-        printf("Server : %s\n", messageRecieved); 
+    //Send random messages
+    for(int i=0; i<10; i++){
+        string message = "Message-" + to_string(i) + " from client-1";
+        char *messageToBeSent = const_cast<char*>(message.c_str());
+        sendto(sockfd, (const char *)messageToBeSent, strlen(messageToBeSent), MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)); 
     }
     
     close(sockfd); 

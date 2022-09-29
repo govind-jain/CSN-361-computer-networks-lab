@@ -2,14 +2,29 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
-#include <string.h> 
+#include <bits/stdc++.h> 
 #include <sys/types.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h>
 
 #define PORT 8080 
-#define MAXLINE 1024 
+#define MAXLINE 1024
+
+using namespace std;
+
+string getMessage(char* buffer, int st, int en, int lim){
+
+    en = min(en, lim);
+
+    string res = "";
+
+    for(int i=st; i<en; i++){
+        res += buffer[i];
+    }
+
+    return res;
+}
 
 // Driver code
 int main(){ 
@@ -21,7 +36,7 @@ int main(){
     int clientLimit = 10;
 
     struct sockaddr_in sinkAddress;
-    int sizeSinkAddress;
+    socklen_t sizeSinkAddress;
     
     // Creating socket file descriptor 
     if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){ 
@@ -50,43 +65,61 @@ int main(){
     }
 
     char buffer[MAXLINE];
-    int len, n;
+    socklen_t len;
+    ssize_t n;
 
-    char *connectRequest = "I want to connect";
-    char *youAreSource  = "You are successfully connected. You will be treated as source";
-    char *youAreSink = "You are successfully connected. You will be treated as sink";
-    char *pleaseConnectFirst = "Please send connection request before sending other messages";
+    char* connectRequest = "I want to connect";
+    char* youAreSource  = "You are successfully connected. You will be treated as source";
+    char* youAreSink = "You are successfully connected. You will be treated as sink";
+    char* pleaseConnectFirst = "Please send connection request before sending other messages";
 
-    while(1){
-        n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
+    int idx = 0;
+    int lim;
 
-        if(1){
+    while(true){
+
+        n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
+
+        if(n == -1){
+            printf("Message not recieved successfully");
+            continue;
+        }
+        
+        string strRecieved = getMessage(buffer, 0, 0 + n, MAXLINE);
+        char* messageRecieved = const_cast<char*>(strRecieved.c_str());
+
+        idx += n;
+
+        if(strcmp(messageRecieved, connectRequest) == 0){
 
             if(clientCount == clientLimit){
                 printf("Maximum client limit crossed");
                 break;
             }
 
-            if(clientCount == 0){
+            clientCount++;
+
+            if(clientCount == 1){
                 sinkAddress = cliaddr;
                 sizeSinkAddress = len;
                 sendto(sockfd, (const char *)youAreSink, strlen(youAreSink), MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
+                cout<<("Client-" + to_string(clientCount) + " is added. It will be treated as sink.")<<endl;
             }
             else{
                 sendto(sockfd, (const char *)youAreSource, strlen(youAreSource), MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len); 
+                cout<<("Client-" + to_string(clientCount) + " is added. It will be treated as source.")<<endl;
             }
-
-            clientCount++;
         }
         else{
             if(clientCount == 0){
                 sendto(sockfd, (const char *)pleaseConnectFirst, strlen(pleaseConnectFirst), MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
             }
             else{
-                sendto(sockfd, (const char *)buffer, strlen(buffer), MSG_CONFIRM, (const struct sockaddr *) &sinkAddress, sizeSinkAddress);           
+                sendto(sockfd, (const char *)messageRecieved, strlen(messageRecieved), MSG_CONFIRM, (const struct sockaddr *) &sinkAddress, sizeSinkAddress);           
             }
         }
     }
 
+    close(sockfd);
     return 0;
 }
