@@ -10,16 +10,16 @@
     
 #define PORT 8080 
 #define MAXLINE 1024 
-    
+
 // Driver code 
-int main() { 
+int main(){
+
     int sockfd; 
-    char buffer[MAXLINE]; 
-    char *hello = "Hello from client"; 
+    char buffer[MAXLINE];
     struct sockaddr_in servaddr; 
     
     // Creating socket file descriptor 
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+    if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){ 
         perror("socket creation failed"); 
         exit(EXIT_FAILURE); 
     } 
@@ -31,14 +31,27 @@ int main() {
     servaddr.sin_port = htons(PORT); 
     servaddr.sin_addr.s_addr = INADDR_ANY; 
         
-    int n, len; 
+    
+    char *connectRequest = "I want to connect";
+    char *youAreSource  = "You are successfully connected. You will be treated as source";
+    char *youAreSink = "You are successfully connected. You will be treated as sink";
+    
+    int n, len;
+    int connectionEstablished = 0;
+
+    sendto(sockfd, (const char *)connectRequest, strlen(connectRequest), MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)); 
+    printf("Connection request sent.\n"); 
+
+    while(1){
+        n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, (struct sockaddr *) &servaddr, &len); 
         
-    sendto(sockfd, (const char *)hello, strlen(hello), MSG_CONFIRM, (const struct sockaddr *) &servaddr, sizeof(servaddr)); 
-    printf("Hello message sent.\n"); 
-            
-    n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, (struct sockaddr *) &servaddr, &len); 
-    buffer[n] = '\0'; 
-    printf("Server : %s\n", buffer); 
+        if(connectionEstablished==0 && strcmp(buffer, youAreSource) == 0){
+            connectionEstablished = 1;
+            break;
+        }
+
+        printf("Server : %s\n", buffer); 
+    }
     
     close(sockfd); 
     return 0; 
