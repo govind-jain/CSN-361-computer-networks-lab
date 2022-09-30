@@ -36,7 +36,9 @@ timer t;
 set<int> recieved;
 set<int> frames;
 
-int reciever(int frameId){
+int maxAck = -1;
+
+int recieverUtil(int frameId){
 
     cout<<"Reciever: ";
 
@@ -53,9 +55,19 @@ int reciever(int frameId){
 void sender(int w){
 
     int lim = min(w, int(frames.size()));
+    int idLim;
     int count = 0;
 
+    if(!frames.empty()){
+        idLim = *(frames.begin()) + w;
+    }
+
     for(auto it = frames.begin(); it!=frames.end() && count<lim; it++){
+        
+        if(*it >= idLim){
+            break;
+        }
+        
         cout<<"Sender: Sending the frame : "<<(*it)<<endl;
         count++;
     }
@@ -78,6 +90,48 @@ void deleteFromFrames(vector<int> &toBeDeleted){
 
 }
 
+void reciever(int w){
+    int lim = min(w, int(frames.size()));
+    int count = 0;
+
+    vector<int> toBeErased;
+
+    int idLim;
+
+    if(!frames.empty()){
+        idLim = *(frames.begin()) + w;
+    }
+
+    for(auto it = frames.begin(); it!=frames.end() && count<lim; it++){
+        
+        if(*it >= idLim){
+            break;
+        }
+
+        bool messageReached = rand() % 2;
+
+        if(messageReached){
+            int token = recieverUtil(*it);
+
+            bool ackRecieved = rand() % 2;
+
+            if(ackRecieved){
+                if(token == 1){
+                    toBeErased.push_back(*it);
+                }
+                else if(token == 2){
+                    cout<<"Sender: Frame "<<(*it)<<" was already recieved by the reciever."<<endl;
+                    toBeErased.push_back(*it);
+                }
+            }
+        }
+
+        count++;
+    }
+
+    deleteFromFrames(toBeErased);
+}
+
 int main(){
 
     fillSet(frames, 8);
@@ -95,35 +149,7 @@ int main(){
 
         randomProcessing();
 
-        int lim = min(w, int(frames.size()));
-        int count = 0;
-
-        vector<int> toBeErased;
-
-        for(auto it = frames.begin(); it!=frames.end() && count<lim; it++){
-            
-            bool messageReached = rand() % 2;
-
-            if(messageReached){
-                int token = reciever(*it);
-
-                bool ackRecieved = rand() % 2;
-
-                if(ackRecieved){
-                    if(token == 1){
-                        toBeErased.push_back(*it);
-                    }
-                    else if(token == 2){
-                        cout<<"Sender: Frame "<<(*it)<<" was already recieved by the reciever."<<endl;
-                        toBeErased.push_back(*it);
-                    }
-                }
-            }
-
-            count++;
-        }
-
-        deleteFromFrames(toBeErased);
+        reciever(w);
 
         randomProcessing();
         
